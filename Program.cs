@@ -12,6 +12,8 @@ namespace Code
         /// <param name="s">string s doesn't have blank char</param>
         private static void ProcessInputString(string s)
         {
+            if (string.IsNullOrWhiteSpace(s)) return;
+
             SortedDictionary<char, int> charCountMap = new SortedDictionary<char, int>();
 
             foreach (char c in s)
@@ -73,7 +75,7 @@ namespace Code
             var orderedGroups = numbers.GroupBy(x => x)
                 .OrderByDescending(x => x.Count());
 
-            if (numbers.Length > 1 && orderedGroups.ElementAt(0).Count() == orderedGroups.ElementAt(1).Count())
+            if (orderedGroups.Count() > 1 && orderedGroups.ElementAt(0).Count() == orderedGroups.ElementAt(1).Count())
             {
                 mode = 0;       // irrelevant value
                 return false;
@@ -102,29 +104,36 @@ namespace Code
 
         public static void Main()
         {
+            decimal[] numbers = null;
+
             while (true)
             {
                 Console.Write("input: ");
                 string[] tokens = Console.ReadLine().Split(' ');
 
-                if (tokens[0].Equals("quit", StringComparison.InvariantCultureIgnoreCase))
+                if (tokens[0].Equals("quit", StringComparison.InvariantCultureIgnoreCase) && tokens.Length == 1)
                 {
                     break;
                 }
 
+                bool literalString = false;
                 try
                 {
                     // Use decimal data type and Convert.ToDecimal to handle decimal numbers too.
-                    decimal[] numbers = new decimal[tokens.Length];
                     numbers = Array.ConvertAll(tokens, x => Convert.ToDecimal(x));
-
-                    // Input is a bunch of numbers
-                    ProcessInputNumbers(numbers);
                 }
                 catch
                 {
-                    // Input is a literal string
+                    literalString = true;
+                }
+
+                if (literalString)
+                {
                     ProcessInputString(string.Join("", tokens));
+                }
+                else
+                {
+                    ProcessInputNumbers(numbers);
                 }
             }
         }
